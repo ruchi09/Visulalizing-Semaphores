@@ -35,10 +35,6 @@ void timer()
       t--;
     }
 
-    //If bathroom is still occupied, wait till remaining people exits.
-    while(PeopleInBathroom>0)
-      sleep(1);
-
 
     // Allocate bathroom to the other gender.
 
@@ -47,6 +43,16 @@ void timer()
 
     else if(GenderUsingBathroom == FEMALE)
       GenderUsingBathroom=MALE;
+
+
+      
+
+    //If bathroom is still occupied, wait till remaining people exits.
+    while(PeopleInBathroom>0)
+      sleep(1);
+
+
+
   }// end of while
 
 }// end of timer function
