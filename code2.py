@@ -2,14 +2,14 @@ import threading
 from time import sleep
 import random
 
-TIMEOUT = 4
+#constants
 MALE =1
 FEMALE = 0
 MAX_PEOPLE = 3
 
-
-queue= list()
-personNo=1
+# global variables
+queue= list()               #to maintain queue outside bathroom
+personNo=1                  # provides id for each person
 PeopleInBathroom=0
 GenderUsingBathroom=0
 
@@ -25,10 +25,7 @@ sem_mutex = threading.Semaphore()
 
 
 
-
-
-
-def GeneratePeople():
+def GeneratePeople():  #generates people who need to use bathroom at random times
 
     global queue
     global personNo
@@ -56,10 +53,11 @@ def GeneratePeople():
 
 
 
-def GoIn():
+def GoIn():                 # function to send people into bathroom for queue
 
     global queue
     global GenderUsingBathroom
+    global PeopleInBathroom
 
     while 1:
 
@@ -69,10 +67,10 @@ def GoIn():
 
             sem_queue.release()
 
-            sem_mutex.acquire()
-            print "\nNext turn: ",p
+            sem_mutex.acquire()  # for GenderUsingBathroom
+
             if GenderUsingBathroom == p[0] :    # if same gender, go in
-                print "\nsame gender"
+
                 sem_mutex.release()
                 sem_bathroom.acquire()
                 t = threading.Thread(target=UsingTime,args=(p,))
@@ -89,9 +87,10 @@ def GoIn():
 
                 sem_mutex.release()
                 sem_bathroom.acquire()
+                GenderUsingBathroom = p[0]
                 t1 = threading.Thread(target=UsingTime,args=(p,))
                 t1.start()
-                GenderUsingBathroom = p[0]
+
 
         else:
             sem_queue.release()
@@ -102,12 +101,16 @@ def GoIn():
 
 
 
-def UsingTime( person):
+def UsingTime( person):             # monitors the usage of bathroom for each person
 
     global PeopleInBathroom
 
     sem_mutex.acquire()
-    print "\nperson " , person[1],"entering from bathroom , gender = ",person[0]
+    print "\nperson " , person[1],"entering from bathroom , gender = ",
+    if person[0]==FEMALE:
+        print "FEMALE"
+    else:
+        print "MALE"
 
     PeopleInBathroom+=1   #enters bathroom
     sem_mutex.release()
