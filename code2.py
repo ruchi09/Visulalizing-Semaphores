@@ -1,6 +1,27 @@
+from Tkinter import *
 import threading
 from time import sleep
 import random
+
+class App(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.pack()
+
+#Declare App object
+root = App()
+root.master.title("Unisex Bathroom Simulation")
+root.master.minsize(width=1024, height=720)
+root.master.maxsize(width=1024, height=720)
+
+#Add and align images
+male = PhotoImage(file="male.gif")
+female = PhotoImage(file="female.gif")
+bathroom = PhotoImage(file="unisex_bathroom.gif")
+#w2 = Label(root, image=female, borderwidth=2, bg="green").pack(side=LEFT, padx=10)
+w3 = Label(root, image=bathroom, compound=CENTER, bg="blue").pack(side=LEFT, padx=10)
+#w4 = Label(root, image=male, borderwidth=2, bg="green").pack(side=LEFT, padx=10)
+global w1, w2
 
 #constants
 MALE =1
@@ -19,16 +40,11 @@ sem_bathroom=   threading.Semaphore( value= MAX_PEOPLE)
 sem_queue = threading.Semaphore()
 sem_mutex = threading.Semaphore()
 
-
-
-
-
-
-
 def GeneratePeople():  #generates people who need to use bathroom at random times
 
     global queue
     global personNo
+    global w1, w2
 
 
     while 1:
@@ -37,10 +53,12 @@ def GeneratePeople():  #generates people who need to use bathroom at random time
         if random.randint(0,1)==MALE:
             queue.insert(0,[MALE,personNo]);
             personNo+=1
+            w2 = Label(root, image=male, borderwidth=2, bg="red").pack(side=LEFT, padx=10)
             print "\na male came, id=", personNo-1
         else:
             queue.insert(0,[FEMALE,personNo]);
             personNo+=1
+            w1 = Label(root, image=female, borderwidth=2, bg="red").pack(side=LEFT, padx=10)
             print "\na female came, id=", personNo-1
 
         sem_queue.release()
@@ -109,8 +127,10 @@ def UsingTime( person):             # monitors the usage of bathroom for each pe
     print "\nperson " , person[1],"entering from bathroom , gender = ",
     if person[0]==FEMALE:
         print "FEMALE"
+        w1.config(bg="green")
     else:
         print "MALE"
+        w2.config(bg="green")
 
     PeopleInBathroom+=1   #enters bathroom
     sem_mutex.release()
@@ -141,3 +161,6 @@ if __name__ == "__main__":
     t2 = threading.Thread(target=GoIn)
     #threads.append(t)
     t2.start()
+
+#Run event loop
+root.mainloop()
